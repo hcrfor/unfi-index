@@ -465,3 +465,61 @@
   font-size: 22px;
   font-weight: 800;
 }
+
+/* 모바일 반응형 최적화 (가로 480px 이하 디바이스) */
+@media (max-width: 480px) {
+  /* 1. 검색창 플레이스홀더 잘림 방지 및 인풋 스타일 조정 */
+  .search-input {
+    font-size: 16px;
+    padding: 14px 14px 14px 42px;
+  }
+  
+  .search-input::placeholder {
+    font-size: 13.5px; /* 글자가 잘리지 않도록 크기 소폭 조율 */
+    letter-spacing: -0.5px;
+  }
+
+  .search-icon {
+    left: 14px;
+    width: 20px;
+    height: 20px;
+  }
+
+  /* 2. 통계 바: 줄바꿈 방지를 위해 세로 정렬 및 여백 조율 */
+  .stats-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 12px 14px;
+  }
+
+  .stats-bar span {
+    font-size: 15px;
+  }
+
+  /* 3. 카드 그리드 레이아웃: 22px 크기 폰트가 잘리지 않도록 1열 정렬로 최적화 */
+  .card-body-grid {
+    grid-template-columns: 1fr; /* 2열에서 1열로 펴주기 */
+    gap: 14px;
+    padding-top: 14px;
+  }
+
+  .grid-item {
+    gap: 2px;
+  }
+
+  /* 4. 카드 내의 글자 크기를 모바일 뷰에 알맞게 정비 */
+  .grid-label {
+    font-size: 12px;
+  }
+
+  .grid-value {
+    font-size: 20px; /* 모바일 전폭에서는 20px만 되어도 충분히 큼직하고 안정적임 */
+    word-break: break-all;
+  }
+
+  .grid-value.highlight-green {
+    font-size: 20px;
+  }
+}
+
