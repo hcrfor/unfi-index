@@ -1,0 +1,50 @@
+:root {
+  --primary: #1b4d3e;       /* 깊은 산림 초록 */
+  --primary-light: #e8f5e9; /* 부드러운 초록 배경 */
+  --accent: #2e7d32;        /* 강조 초록 */
+  --bg-app: #f4f6f7;        /* 모바일 배경 회색 */
+  --bg-card: #ffffff;       /* 카드 흰색 배경 */
+  --text-main: #111827;     /* 본문 검은색 */
+  --text-sub: #4b5563;      /* 서브 텍스트 회색 */
+  --text-muted: #9ca3af;    /* 흐린 텍스트 */
+  --border: #e5e7eb;        /* 연한 회색 보더 */
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  line-height: 1.5;
+  user-select: none; /* 야외 터치 시 텍스트 긁힘 방지 */
+}
+
+#root {
+  width: 100%;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-app);
+}
+
+/* 터치 영역 및 입력 최적화 */
+input, button {
+  font-family: inherit;
+  font-size: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* 스크롤바 감추기 (모바일 앱 느낌 구현) */
+::-webkit-scrollbar {
+  display: none;
+}
