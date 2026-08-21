@@ -41,9 +41,18 @@ def main():
         # Excel 파일을 읽어옵니다. (모든 열은 일관성을 위해 기본 로드 후 가공)
         df = pd.read_excel(EXCEL_FILE)
         
+        # X 좌표, Y 좌표 컬럼명 유연하게 매핑 (기존 'X 좌표' -> 신규 'POINT_X' 대응)
+        x_col = next((c for c in ['POINT_X', 'X 좌표', 'X좌표', 'X'] if c in df.columns), None)
+        y_col = next((c for c in ['POINT_Y', 'Y 좌표', 'Y좌표', 'Y'] if c in df.columns), None)
+        
         # 실제 컬럼명 검증 (데이터 정합성 체크)
-        required_cols = ['표본점번호', '유형', 'X 좌표', 'Y 좌표', '주소', '조사번호', '표고']
+        required_cols = ['표본점번호', '유형', '주소', '조사번호', '표고']
         missing_cols = [col for col in required_cols if col not in df.columns]
+        
+        if not x_col:
+            missing_cols.append('X 좌표 (or POINT_X)')
+        if not y_col:
+            missing_cols.append('Y 좌표 (or POINT_Y)')
         
         if missing_cols:
             print(f"[오류] 엑셀 파일 내 필수 컬럼이 부족합니다: {missing_cols}")
@@ -61,8 +70,8 @@ def main():
             parsed_item = {
                 'sampleId': sample_id,
                 'type': safe_str_convert(row['유형']),
-                'coordX': safe_str_convert(row['X 좌표']),
-                'coordY': safe_str_convert(row['Y 좌표']),
+                'coordX': safe_str_convert(row[x_col]),
+                'coordY': safe_str_convert(row[y_col]),
                 'address': safe_str_convert(row['주소']),
                 'surveyId': safe_str_convert(row['조사번호']),
                 'elevation': safe_str_convert(row['표고']),

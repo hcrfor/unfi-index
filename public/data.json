@@ -47308,5 +47308,435 @@
     "surveyId": "충주시_예비_7",
     "elevation": "105",
     "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "261132616783",
+    "type": "가로수",
+    "coordX": "1132600",
+    "coordY": "1678300",
+    "address": "부산광역시 사하구 신평동 666",
+    "surveyId": "가로수_예비_추가",
+    "elevation": "3",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "261132916757",
+    "type": "가로수",
+    "coordX": "1132900",
+    "coordY": "1675700",
+    "address": "부산광역시 사하구 다대동 1525",
+    "surveyId": "가로수_예비_추가",
+    "elevation": "6",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "110958119508",
+    "type": "가로수",
+    "coordX": "958100",
+    "coordY": "1950800",
+    "address": "서울특별시 성동구 행당동 346-1",
+    "surveyId": "가로수_예비_추가",
+    "elevation": "15",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "110959119526",
+    "type": "가로수",
+    "coordX": "959100",
+    "coordY": "1952600",
+    "address": "서울특별시 성동구 마장동 527-11",
+    "surveyId": "가로수_예비_추가",
+    "elevation": "14",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "410958419720",
+    "type": "가로수",
+    "coordX": "958400",
+    "coordY": "1972000",
+    "address": "경기도 의정부시 가능동 546-3",
+    "surveyId": "가로수_예비_추가",
+    "elevation": "39",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "410962319722",
+    "type": "가로수",
+    "coordX": "962300",
+    "coordY": "1972200",
+    "address": "경기도 의정부시 신곡동 759-1",
+    "surveyId": "가로수_예비_추가",
+    "elevation": "33",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "410962419892",
+    "type": "경관숲",
+    "coordX": "962400",
+    "coordY": "1989200",
+    "address": "경기도 동두천시 생연동 산65-3",
+    "surveyId": "경관숲_예비_추가",
+    "elevation": "120",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "410961919954",
+    "type": "마을숲",
+    "coordX": "961900",
+    "coordY": "1995400",
+    "address": "경기도 동두천시 하봉암동 39-1",
+    "surveyId": "마을숲_예비_추가",
+    "elevation": "98",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "471095017814",
+    "type": "가로수",
+    "coordX": "1095000",
+    "coordY": "1781400",
+    "address": "경상북도 칠곡군 동명면 학명리 산127-3",
+    "surveyId": "가로수_예비_추가",
+    "elevation": "235",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "471082817708",
+    "type": "가로수",
+    "coordX": "1082800",
+    "coordY": "1770800",
+    "address": "경상북도 칠곡군 왜관읍 낙산리 1383",
+    "surveyId": "가로수_예비_추가",
+    "elevation": "43",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "511051119963",
+    "type": "경관숲",
+    "coordX": "1051100",
+    "coordY": "1996300",
+    "address": "강원특별자치도 인제군 남면 신남리 666",
+    "surveyId": "경관숲_예비_추가",
+    "elevation": "183",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "511058220063",
+    "type": "경관숲",
+    "coordX": "1058200",
+    "coordY": "2006300",
+    "address": "강원특별자치도 인제군 인제읍 남북리 620-1",
+    "surveyId": "경관숲_예비_추가",
+    "elevation": "198",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "511058820079",
+    "type": "마을숲",
+    "coordX": "1058800",
+    "coordY": "2007900",
+    "address": "강원특별자치도 인제군 인제읍 상동리 349-6",
+    "surveyId": "마을숲_예비_추가",
+    "elevation": "208",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "511058320059",
+    "type": "경관숲",
+    "coordX": "1058300",
+    "coordY": "2005900",
+    "address": "강원특별자치도 인제군 인제읍 남북리 520",
+    "surveyId": "경관숲_예비_추가",
+    "elevation": "193",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "511059620080",
+    "type": "경관숲",
+    "coordX": "1059600",
+    "coordY": "2008000",
+    "address": "강원특별자치도 인제군 인제읍 합강리 377-4",
+    "surveyId": "경관숲_예비_추가",
+    "elevation": "193",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "511062520263",
+    "type": "경관숲",
+    "coordX": "1062500",
+    "coordY": "2026300",
+    "address": "강원특별자치도 인제군 서화면 천도리 297",
+    "surveyId": "경관숲_예비_추가",
+    "elevation": "243",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "511061320130",
+    "type": "도시숲",
+    "coordX": "1061300",
+    "coordY": "2013000",
+    "address": "강원특별자치도 인제군 북면 원통리 1701",
+    "surveyId": "도시숲_예비_추가",
+    "elevation": "213",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "511069720010",
+    "type": "경관숲",
+    "coordX": "1069700",
+    "coordY": "2001000",
+    "address": "강원특별자치도 인제군 기린면 북리 1503",
+    "surveyId": "경관숲_예비_추가",
+    "elevation": "263",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "511062020255",
+    "type": "경관숲",
+    "coordX": "1062000",
+    "coordY": "2025500",
+    "address": "강원특별자치도 인제군 서화면 천도리 1094-30",
+    "surveyId": "경관숲_예비_추가",
+    "elevation": "248",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "511066019846",
+    "type": "마을숲",
+    "coordX": "1066000",
+    "coordY": "1984600",
+    "address": "강원특별자치도 인제군 상남면 상남리 490-1",
+    "surveyId": "마을숲_예비_추가",
+    "elevation": "273",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "460895316502",
+    "type": "학교숲",
+    "coordX": "895300",
+    "coordY": "1650200",
+    "address": "전라남도 신안군 압해읍 신장리 518-1",
+    "surveyId": "학교숲_예비_추가",
+    "elevation": "10",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "460882116743",
+    "type": "경관숲",
+    "coordX": "882100",
+    "coordY": "1674300",
+    "address": "전라남도 신안군 지도읍 읍내리 342-2",
+    "surveyId": "경관숲_예비_추가",
+    "elevation": "14",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "460891216532",
+    "type": "학교숲",
+    "coordX": "891200",
+    "coordY": "1653200",
+    "address": "전라남도 신안군 압해읍 학교리 565-3",
+    "surveyId": "학교숲_예비_추가",
+    "elevation": "13",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "460882916753",
+    "type": "경관숲",
+    "coordX": "882900",
+    "coordY": "1675300",
+    "address": "전라남도 신안군 지도읍 광정리 1115",
+    "surveyId": "경관숲_예비_추가",
+    "elevation": "7",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "460883316756",
+    "type": "경관숲",
+    "coordX": "883300",
+    "coordY": "1675600",
+    "address": "전라남도 신안군 지도읍 광정리 703-2",
+    "surveyId": "경관숲_예비_추가",
+    "elevation": "8",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "460969016985",
+    "type": "가로수",
+    "coordX": "969000",
+    "coordY": "1698500",
+    "address": "전라남도 곡성군 겸면 마전리 1234",
+    "surveyId": "가로수_예비_추가",
+    "elevation": "58",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "460981916996",
+    "type": "가로수",
+    "coordX": "981900",
+    "coordY": "1699600",
+    "address": "전라남도 곡성군 곡성읍 학정리 62-4",
+    "surveyId": "가로수_예비_추가",
+    "elevation": "53",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "460883116754",
+    "type": "경관숲",
+    "coordX": "883100",
+    "coordY": "1675400",
+    "address": "전라남도 신안군 지도읍 광정리 산141-1",
+    "surveyId": "경관숲_예비_추가",
+    "elevation": "30",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "460878516761",
+    "type": "경관숲",
+    "coordX": "878500",
+    "coordY": "1676100",
+    "address": "전라남도 신안군 지도읍 감정리 1165-125",
+    "surveyId": "경관숲_예비_추가",
+    "elevation": "7",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "460881916747",
+    "type": "마을숲",
+    "coordX": "881900",
+    "coordY": "1674700",
+    "address": "전라남도 신안군 지도읍 읍내리 1702",
+    "surveyId": "마을숲_예비_추가",
+    "elevation": "10",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "460881816747",
+    "type": "경관숲",
+    "coordX": "881800",
+    "coordY": "1674700",
+    "address": "전라남도 신안군 지도읍 읍내리 505-14",
+    "surveyId": "경관숲_예비_추가",
+    "elevation": "18",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "460881416757",
+    "type": "경관숲",
+    "coordX": "881400",
+    "coordY": "1675700",
+    "address": "전라남도 신안군 지도읍 감정리 57",
+    "surveyId": "경관숲_예비_추가",
+    "elevation": "8",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "460878416762",
+    "type": "경관숲",
+    "coordX": "878400",
+    "coordY": "1676200",
+    "address": "전라남도 신안군 지도읍 감정리 2026",
+    "surveyId": "경관숲_예비_추가",
+    "elevation": "6",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "460881616762",
+    "type": "경관숲",
+    "coordX": "881600",
+    "coordY": "1676200",
+    "address": "전라남도 신안군 지도읍 감정리 25",
+    "surveyId": "경관숲_예비_추가",
+    "elevation": "7",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "460881716750",
+    "type": "경관숲",
+    "coordX": "881700",
+    "coordY": "1675000",
+    "address": "전라남도 신안군 지도읍 읍내리 398-8",
+    "surveyId": "경관숲_예비_추가",
+    "elevation": "12",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "471160317651",
+    "type": "가로수",
+    "coordX": "1160300",
+    "coordY": "1765100",
+    "address": "경상북도 경주시 천북면 물천리 803-2",
+    "surveyId": "가로수_예비_추가",
+    "elevation": "78",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "471162817546",
+    "type": "가로수",
+    "coordX": "1162800",
+    "coordY": "1754600",
+    "address": "경상북도 경주시 시래동 326-3",
+    "surveyId": "가로수_예비_추가",
+    "elevation": "48",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "471163717557",
+    "type": "가로수",
+    "coordX": "1163700",
+    "coordY": "1755700",
+    "address": "경상북도 경주시 마동 1083-1",
+    "surveyId": "가로수_예비_추가",
+    "elevation": "100",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "471159117630",
+    "type": "가로수",
+    "coordX": "1159100",
+    "coordY": "1763000",
+    "address": "경상북도 경주시 북군동 188-2",
+    "surveyId": "가로수_예비_추가",
+    "elevation": "58",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "440918418166",
+    "type": "가로수",
+    "coordX": "918400",
+    "coordY": "1816600",
+    "address": "충청남도 보령시 궁촌동 360",
+    "surveyId": "가로수_예비_추가",
+    "elevation": "14",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "440913218035",
+    "type": "가로수",
+    "coordX": "913200",
+    "coordY": "1803500",
+    "address": "충청남도 보령시 웅천읍 독산리 494-2",
+    "surveyId": "가로수_예비_추가",
+    "elevation": "7",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "440919618171",
+    "type": "가로수",
+    "coordX": "919600",
+    "coordY": "1817100",
+    "address": "충청남도 보령시 동대동 1958",
+    "surveyId": "가로수_예비_추가",
+    "elevation": "20",
+    "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "440920718170",
+    "type": "가로수",
+    "coordX": "920700",
+    "coordY": "1817000",
+    "address": "충청남도 보령시 동대동 372-2",
+    "surveyId": "가로수_예비_추가",
+    "elevation": "17",
+    "sourceFile": "2026 전국 인덱스.xlsx"
   }
 ]
