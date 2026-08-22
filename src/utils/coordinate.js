@@ -7,44 +7,37 @@ proj4.defs(
 );
 
 /**
- * 🌟 두 번째 실측 정답 이미지(건물 바로 앞 화단) 위치와 100% 동일하게 좌표를 동기화하는 모듈
+ * 🌟 어떠한 보정이나 변환 없이 2026 전국 인덱스.xlsx 파일의 'EPSG4326' 열 좌표값을 100% 그대로 추출합니다.
  */
 export function getDirectExcelCoordinates(item) {
-  let lat = 37.5665;
-  let lng = 126.9780;
-
+  // 1순위: 엑셀 파일의 'EPSG4326' 열 원본 문자열 (예: "37.5251084278, 126.7168507097")
   if (item && item.epsg4326 && typeof item.epsg4326 === 'string' && item.epsg4326.includes(',')) {
     const parts = item.epsg4326.split(',');
     if (parts.length >= 2) {
-      const pLat = parseFloat(parts[0].trim());
-      const pLng = parseFloat(parts[1].trim());
+      const lat = parseFloat(parts[0].trim());
+      const lng = parseFloat(parts[1].trim());
 
-      if (!isNaN(pLat) && !isNaN(pLng) && pLat > 0 && pLng > 0) {
-        lat = pLat;
-        lng = pLng;
+      if (!isNaN(lat) && !isNaN(lng) && lat > 0 && lng > 0) {
+        return {
+          lat: lat, // 🌟 보정 0%! 엑셀 EPSG4326 열의 수치 그대로!
+          lng: lng, // 🌟 보정 0%! 엑셀 EPSG4326 열의 수치 그대로!
+          isValid: true,
+          source: 'EXCEL_EPSG4326_PURE',
+        };
       }
-    }
-  } else if (item && item.coordX && item.coordY) {
-    const numericX = parseFloat(item.coordX);
-    const numericY = parseFloat(item.coordY);
-    if (!isNaN(numericX) && !isNaN(numericY)) {
-      const [pLng, pLat] = proj4('EPSG:5179', 'WGS84', [numericX, numericY]);
-      lat = pLat;
-      lng = pLng;
     }
   }
 
-  // 🌟 [핵심] 횡단보도가 아닌 두 번째 정답 이미지 속 '301동 건물 바로 앞 화단' 위치로 100% 칼같이 동기화!
-  const targetLat = lat + 0.000155;
-  const targetLng = lng - 0.000008;
+  // 예비용 (EPSG4326이 비어있을 때만)
+  const numericX = parseFloat(item.coordX);
+  const numericY = parseFloat(item.coordY);
 
-  return {
-    rawLat: lat,
-    rawLng: lng,
-    lat: targetLat,
-    lng: targetLng,
-    isValid: true,
-  };
+  if (isNaN(numericX) || isNaN(numericY)) {
+    return { lat: 37.5665, lng: 126.9780, isValid: false, source: 'DEFAULT' };
+  }
+
+  const [lng, lat] = proj4('EPSG:5179', 'WGS84', [numericX, numericY]);
+  return { lat, lng, isValid: true, source: 'UTMK_CONVERTED' };
 }
 
 export function convertUtmkToWgs84(coordX, coordY, epsg4326Str) {
