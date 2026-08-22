@@ -439,37 +439,43 @@
 
 .grid-item.address-grid-item {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  gap: 6px;
   background: #f8fafc;
   padding: 12px 14px;
   border-radius: 12px;
   border: 1px solid #e2e8f0;
 }
 
-.address-text-group {
+.address-header-row {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
 }
 
-/* 주소 옆 📍 위치보기 버튼 디자인 */
+.address-text-full {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-main);
+  word-break: keep-all;
+  line-height: 1.35;
+}
+
+/* 주소 우측 상단 📍 위치보기 콤팩트 뱃지 버튼 */
 .location-view-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   background-color: #10b981;
   color: #ffffff;
   border: none;
-  padding: 8px 14px;
-  border-radius: 20px;
-  font-size: 14px;
+  padding: 5px 11px;
+  border-radius: 16px;
+  font-size: 13px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25);
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
   transition: all 0.2s ease;
   white-space: nowrap;
   flex-shrink: 0;
@@ -478,7 +484,7 @@
 .location-view-btn:hover {
   background-color: #059669;
   transform: translateY(-1px);
-  box-shadow: 0 6px 14px rgba(16, 185, 129, 0.35);
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.35);
 }
 
 .location-view-btn:active {

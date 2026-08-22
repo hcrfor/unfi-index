@@ -173,18 +173,20 @@ function App() {
                     {/* 상세 정보 그리드 영역 - 한 화면에 팝업 없이 모두 표시 */}
                     <div className="card-body-grid">
                       <div className="grid-item full-width address-grid-item">
-                        <div className="address-text-group">
+                        <div className="address-header-row">
                           <span className="grid-label">주소</span>
-                          <span className="grid-value">{item.address}</span>
+                          <button 
+                            className="location-view-btn"
+                            onClick={() => setSelectedMapItem(item)}
+                            title="위성 지도 및 반경 11.3m 원 보기"
+                          >
+                            <MapPin size={14} />
+                            <span>위치보기</span>
+                          </button>
                         </div>
-                        <button 
-                          className="location-view-btn"
-                          onClick={() => setSelectedMapItem(item)}
-                          title="위성 지도 및 반경 11.3m 원 보기"
-                        >
-                          <MapPin size={16} />
-                          <span>위치보기</span>
-                        </button>
+                        <div className="address-text-full">
+                          {item.address}
+                        </div>
                       </div>
                       <div className="grid-item">
                         <span className="grid-label">X 좌표</span>
