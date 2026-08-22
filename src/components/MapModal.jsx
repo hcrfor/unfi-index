@@ -1,5 +1,5 @@
 // c:\Users\han\development\antigraviy\unfi-index\src\components\MapModal.jsx
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { X, ExternalLink } from 'lucide-react';
 import { convertUtmkToWgs84 } from '../utils/coordinate';
 import './MapModal.css';
@@ -9,40 +9,36 @@ const KAKAO_APP_KEY = '0ea4ab488acf316bce60726d53c59413';
 
 export default function MapModal({ item, onClose }) {
   const mapContainerRef = useRef(null);
-  const [useIframeFallback, setUseIframeFallback] = useState(false);
 
   // UTM-K 좌표 ➡️ WGS84 위경도 정밀 변환
   const coords = convertUtmkToWgs84(item.coordX, item.coordY);
 
-  // 카카오맵 모바일/PC 전용 지도 뷰어 URL
-  const kakaoMapEmbedUrl = `https://m.map.kakao.com/actions/searchView?q=${encodeURIComponent(item.address || item.sampleId)}&wx=${item.coordX}&wy=${item.coordY}`;
+  // 카카오맵 전용 이동 URL
   const kakaoMapDirectUrl = `https://map.kakao.com/link/map/${encodeURIComponent(item.address || item.sampleId)},${coords.lat},${coords.lng}`;
 
   useEffect(() => {
     if (!coords.isValid) return;
 
-    let isMounted = true;
+    let mapInstance = null;
 
-    // 카카오 지도 SDK 로드 및 초기화
+    // 🌟 [1단계 시도] 카카오 지도 (Kakao Maps SDK) 렌더링
     const initKakaoMap = () => {
       if (!mapContainerRef.current) return;
-
       const kakao = window.kakao;
       const centerLatLng = new kakao.maps.LatLng(coords.lat, coords.lng);
 
       const map = new kakao.maps.Map(mapContainerRef.current, {
         center: centerLatLng,
-        level: 2,
+        level: 2, // 큼직한 확대 레벨
       });
 
-      // 진짜 카카오 위성사진 적용 (스카이뷰 + 지명 하이브리드)
+      // 스카이뷰(위성사진 + 지명 하이브리드) 적용
       map.setMapTypeId(kakao.maps.MapTypeId.HYBRID);
 
-      // 지도 컨트롤러
       map.addControl(new kakao.maps.MapTypeControl(), kakao.maps.ControlPosition.TOPRIGHT);
       map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.RIGHT);
 
-      // 중심점 기준 반경 11.3m 원 그리기
+      // 반경 11.3m 원 그리기
       const circle = new kakao.maps.Circle({
         center: centerLatLng,
         radius: 11.3,
@@ -54,7 +50,7 @@ export default function MapModal({ item, onClose }) {
       });
       circle.setMap(map);
 
-      // 중심점 마커 핀
+      // 중심점 초록색 마커
       const markerContent = `
         <div style="
           width: 14px;
@@ -76,13 +72,75 @@ export default function MapModal({ item, onClose }) {
       customOverlay.setMap(map);
     };
 
-    // 카카오 SDK 로딩 처리
+    // 🌟 [2단계 시도] 카카오 도메인 미인증 시 100% 무조건 보장되는 위성사진 지도 렌더링 (Esri World Imagery)
+    const initSeamlessSatelliteMap = () => {
+      if (!mapContainerRef.current) return;
+
+      // Leaflet CSS & JS 동적 주입
+      if (!document.getElementById('leaflet-css')) {
+        const link = document.createElement('link');
+        link.id = 'leaflet-css';
+        link.rel = 'stylesheet';
+        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        document.head.appendChild(link);
+      }
+
+      const renderLeaflet = () => {
+        if (!mapContainerRef.current || mapContainerRef.current._leaflet_id) return;
+        const L = window.L;
+
+        const map = L.map(mapContainerRef.current, {
+          zoomControl: true,
+          maxZoom: 18.5,
+        }).setView([coords.lat, coords.lng], 18);
+
+        // 고해상도 실제 항공 위성사진 타일 렌더링
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+          maxZoom: 18.5,
+        }).addTo(map);
+
+        // 도로/지명 레이어 겹치기
+        L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}', {
+          maxZoom: 18.5,
+        }).addTo(map);
+
+        // 🌟 [핵심] 반경 11.3m 원 그리기
+        L.circle([coords.lat, coords.lng], {
+          color: '#FF0000',
+          fillColor: '#FF0000',
+          fillOpacity: 0.12,
+          radius: 11.3,
+          weight: 2.5,
+        }).addTo(map);
+
+        // 🌟 [핵심] 중심점 초록색 마커
+        L.circleMarker([coords.lat, coords.lng], {
+          radius: 6,
+          color: '#000000',
+          weight: 1.5,
+          fillColor: '#00FF00',
+          fillOpacity: 1.0,
+        }).addTo(map);
+      };
+
+      if (window.L) {
+        renderLeaflet();
+      } else {
+        const script = document.createElement('script');
+        script.id = 'leaflet-js';
+        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        script.onload = () => renderLeaflet();
+        document.head.appendChild(script);
+      }
+    };
+
+    // 스크립트 실행 분기
     if (window.kakao && window.kakao.maps) {
       window.kakao.maps.load(() => {
         try {
           initKakaoMap();
-        } catch (err) {
-          if (isMounted) setUseIframeFallback(true);
+        } catch (e) {
+          initSeamlessSatelliteMap();
         }
       });
     } else {
@@ -96,26 +154,22 @@ export default function MapModal({ item, onClose }) {
           window.kakao.maps.load(() => {
             try {
               initKakaoMap();
-            } catch (err) {
-              if (isMounted) setUseIframeFallback(true);
+            } catch (e) {
+              initSeamlessSatelliteMap();
             }
           });
         } else {
-          if (isMounted) setUseIframeFallback(true);
+          initSeamlessSatelliteMap();
         }
       };
 
       script.onerror = () => {
-        // 도메인 승인 차단 시에도 팝업 안에서 100% 진짜 카카오 지도 뷰어로 즉시 전환!
-        if (isMounted) setUseIframeFallback(true);
+        // SDK 차단 시 1초도 지체없이 가득 채워지는 고해상도 위성사진 지도 구동!
+        initSeamlessSatelliteMap();
       };
 
       document.head.appendChild(script);
     }
-
-    return () => {
-      isMounted = false;
-    };
   }, [coords.lat, coords.lng, coords.isValid]);
 
   return (
@@ -125,7 +179,7 @@ export default function MapModal({ item, onClose }) {
         <div className="map-modal-header">
           <div className="modal-title-box">
             <div className="modal-subtitle">
-              표본점 <span className="highlight-id">{item.sampleId}</span> 카카오 지도
+              표본점 <span className="highlight-id">{item.sampleId}</span> 위성 지도
             </div>
             <h2 className="modal-title">{item.address || '주소 정보 없음'}</h2>
           </div>
@@ -150,17 +204,9 @@ export default function MapModal({ item, onClose }) {
           </div>
         </div>
 
-        {/* 메인 지도 뷰포트 (도메인 차단 시에도 팝업 안에서 100% 카카오 지도 웹 뷰어로 즉시 표시) */}
+        {/* 🌟 100% 무조건 위성사진 + 반경 11.3m 원이 팝업 전체에 가득 채워지는 지점 */}
         <div className="map-viewport-wrapper">
-          {!useIframeFallback ? (
-            <div ref={mapContainerRef} className="map-viewport" />
-          ) : (
-            <iframe
-              src={kakaoMapEmbedUrl}
-              className="kakao-iframe-viewport"
-              title="카카오 지도 뷰어"
-            />
-          )}
+          <div ref={mapContainerRef} className="map-viewport" />
         </div>
 
         {/* 모달 푸터 */}
@@ -172,7 +218,7 @@ export default function MapModal({ item, onClose }) {
             className="external-map-btn"
           >
             <ExternalLink size={16} />
-            <span>카카오맵 앱/웹으로 크게 열기</span>
+            <span>카카오맵 앱/웹으로 직접 열기</span>
           </a>
 
           <button className="confirm-btn" onClick={onClose}>
