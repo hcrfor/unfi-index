@@ -1,16 +1,16 @@
 // c:\Users\han\development\antigraviy\unfi-index\src\components\MapModal.jsx
 import React, { useEffect, useRef } from 'react';
 import { X, ExternalLink } from 'lucide-react';
-import { convertUtmkToWgs84 } from '../utils/coordinate';
+import { getDirectExcelCoordinates } from '../utils/coordinate';
 import './MapModal.css';
 
 export default function MapModal({ item, onClose }) {
   const mapContainerRef = useRef(null);
 
-  // 🌟 엑셀 파일의 'EPSG4326' 열 무손실 100% 원본 위경도 좌표 대입
-  const coords = convertUtmkToWgs84(item.coordX, item.coordY, item.epsg4326);
+  // 🌟 [변환 0%] 엑셀 파일 'EPSG4326' 열의 위도/경도 숫자를 100% 직접 추출
+  const coords = getDirectExcelCoordinates(item);
 
-  // 카카오맵 원본 앱/웹 이동 URL
+  // 카카오맵 원본 이동 URL (엑셀 EPSG4326 원본 위경도 대입)
   const kakaoMapDirectUrl = `https://map.kakao.com/link/map/${encodeURIComponent(item.address || item.sampleId)},${coords.lat},${coords.lng}`;
 
   useEffect(() => {
@@ -18,8 +18,8 @@ export default function MapModal({ item, onClose }) {
 
     let isMapRendered = false;
 
-    // 🌟 [100% 캐시 파괴자 포함 - 진짜 구글 위성 지도 (Google Maps Hybrid Satellite Engine)]
-    const initRealGoogleMap = () => {
+    // 🌟 [엑셀 EPSG4326 직접 좌표 렌더링 엔진]
+    const initDirectExcelMap = () => {
       if (!mapContainerRef.current || isMapRendered) return;
 
       if (!document.getElementById('leaflet-css')) {
@@ -34,20 +34,20 @@ export default function MapModal({ item, onClose }) {
         if (!mapContainerRef.current || mapContainerRef.current._leaflet_id) return;
         const L = window.L;
 
-        // 구글 위성 지도 뷰포트 생성
+        // 🌟 좌표 변환 없이 엑셀 EPSG4326 원본 숫자를 지도에 100% 직접 입력!
         const map = L.map(mapContainerRef.current, {
           zoomControl: true,
           attributionControl: false,
           maxZoom: 20,
         }).setView([coords.lat, coords.lng], 19);
 
-        // 🌟 [핵심] 브라우저 캐시 무력화(Cache-Buster) 및 100% 공인 구글 하이브리드 위성사진 타일
-        L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}&v=g_sat_2026', {
+        // 초고해상도 위성사진 타일
+        L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}&v=g_direct_2026', {
           maxZoom: 20,
           subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
         }).addTo(map);
 
-        // 🌟 엑셀 EPSG4326 원본 중심점 기준 정확한 반경 11.3m 원
+        // 🌟 엑셀 EPSG4326 직접 좌표 기준 반경 11.3m 원
         L.circle([coords.lat, coords.lng], {
           color: '#FF0000',
           fillColor: '#FF0000',
@@ -56,7 +56,7 @@ export default function MapModal({ item, onClose }) {
           weight: 2.5,
         }).addTo(map);
 
-        // 🌟 엑셀 EPSG4326 원본 중심점 초록색 마커
+        // 🌟 엑셀 EPSG4326 직접 좌표 중심점 초록색 마커
         L.circleMarker([coords.lat, coords.lng], {
           radius: 6,
           color: '#000000',
@@ -79,7 +79,7 @@ export default function MapModal({ item, onClose }) {
       }
     };
 
-    initRealGoogleMap();
+    initDirectExcelMap();
   }, [coords.lat, coords.lng, coords.isValid]);
 
   return (
@@ -89,7 +89,7 @@ export default function MapModal({ item, onClose }) {
         <div className="map-modal-header">
           <div className="modal-title-box">
             <div className="modal-subtitle">
-              표본점 <span className="highlight-id">{item.sampleId}</span> 구글 위성 지도 (Google Maps)
+              표본점 <span className="highlight-id">{item.sampleId}</span> 엑셀 EPSG4326 직결 위성 지도
             </div>
             <h2 className="modal-title">{item.address || '주소 정보 없음'}</h2>
           </div>
@@ -105,7 +105,7 @@ export default function MapModal({ item, onClose }) {
             <span className="coord-val">X {item.coordX} / Y {item.coordY}</span>
           </div>
           <div className="coord-tag highlight">
-            <span className="coord-label">엑셀 EPSG4326:</span>
+            <span className="coord-label">엑셀 EPSG4326 원본:</span>
             <span className="coord-val">{coords.lat}°, {coords.lng}°</span>
           </div>
           <div className="coord-tag radius">
@@ -114,7 +114,7 @@ export default function MapModal({ item, onClose }) {
           </div>
         </div>
 
-        {/* 🌟 100% 진짜 구글 위성 지도 (Google Maps) 메인 뷰포트 */}
+        {/* 🌟 엑셀 EPSG4326 원본 숫자로 변환 0% 직접 렌더링되는 메인 뷰포트 */}
         <div className="map-viewport-wrapper">
           <div ref={mapContainerRef} className="map-viewport" />
         </div>
@@ -128,7 +128,7 @@ export default function MapModal({ item, onClose }) {
             className="external-map-btn"
           >
             <ExternalLink size={16} />
-            <span>카카오맵 앱/웹으로 엑셀 좌표 열기</span>
+            <span>카카오맵 앱/웹으로 엑셀 좌표 직접 열기</span>
           </a>
 
           <button className="confirm-btn" onClick={onClose}>
