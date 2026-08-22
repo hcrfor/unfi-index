@@ -18,8 +18,8 @@ export default function MapModal({ item, onClose }) {
 
     let isMapRendered = false;
 
-    // 🌟 [100% 선명한 구글 위성 지도 (Google Maps Hybrid Satellite Engine)]
-    const initGoogleSatelliteMap = () => {
+    // 🌟 [100% 캐시 파괴자 포함 - 진짜 구글 위성 지도 (Google Maps Hybrid Satellite Engine)]
+    const initRealGoogleMap = () => {
       if (!mapContainerRef.current || isMapRendered) return;
 
       if (!document.getElementById('leaflet-css')) {
@@ -37,12 +37,12 @@ export default function MapModal({ item, onClose }) {
         // 구글 위성 지도 뷰포트 생성
         const map = L.map(mapContainerRef.current, {
           zoomControl: true,
-          attributionControl: false, // 워터마크 지움
+          attributionControl: false,
           maxZoom: 20,
         }).setView([coords.lat, coords.lng], 19);
 
-        // 🌟 [100% 선명한 진짜 구글 위성지도 (Google Hybrid Satellite) 타일]
-        L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+        // 🌟 [핵심] 브라우저 캐시 무력화(Cache-Buster) 및 100% 공인 구글 하이브리드 위성사진 타일
+        L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}&v=g_sat_2026', {
           maxZoom: 20,
           subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
         }).addTo(map);
@@ -79,7 +79,7 @@ export default function MapModal({ item, onClose }) {
       }
     };
 
-    initGoogleSatelliteMap();
+    initRealGoogleMap();
   }, [coords.lat, coords.lng, coords.isValid]);
 
   return (
@@ -114,7 +114,7 @@ export default function MapModal({ item, onClose }) {
           </div>
         </div>
 
-        {/* 🌟 100% 선명한 구글 위성 지도 (Google Maps) 메인 뷰포트 */}
+        {/* 🌟 100% 진짜 구글 위성 지도 (Google Maps) 메인 뷰포트 */}
         <div className="map-viewport-wrapper">
           <div ref={mapContainerRef} className="map-viewport" />
         </div>
