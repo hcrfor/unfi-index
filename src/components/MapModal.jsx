@@ -10,8 +10,8 @@ const KAKAO_APP_KEY = '0ea4ab488acf316bce60726d53c59413';
 export default function MapModal({ item, onClose }) {
   const mapContainerRef = useRef(null);
 
-  // UTM-K 좌표 ➡️ WGS84 위경도 정밀 변환
-  const coords = convertUtmkToWgs84(item.coordX, item.coordY);
+  // 🌟 엑셀 실측 EPSG4326 열 1순위 활용 ➡️ WGS84 위경도 정밀 좌표 변환
+  const coords = convertUtmkToWgs84(item.coordX, item.coordY, item.epsg4326);
 
   // 카카오맵 전용 이동 URL
   const kakaoMapDirectUrl = `https://map.kakao.com/link/map/${encodeURIComponent(item.address || item.sampleId)},${coords.lat},${coords.lng}`;

@@ -75,6 +75,7 @@ def main():
                 'address': safe_str_convert(row['주소']),
                 'surveyId': safe_str_convert(row['조사번호']),
                 'elevation': safe_str_convert(row['표고']),
+                'epsg4326': safe_str_convert(row['EPSG4326']) if 'EPSG4326' in df.columns else '',
                 'sourceFile': EXCEL_FILE  # 출처 명시
             }
             results.append(parsed_item)

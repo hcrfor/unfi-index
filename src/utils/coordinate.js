@@ -3,7 +3,6 @@ import proj4 from 'proj4';
 
 /**
  * 대한민국 표준 UTM-K (EPSG:5179 - GRS80 타원체) 좌표계 정의
- * 국토교통부, 산림청, 카카오/네이버지도에서 사용하는 공인 표준 좌표계
  */
 proj4.defs(
   'EPSG:5179',
@@ -11,31 +10,51 @@ proj4.defs(
 );
 
 /**
- * UTM-K 좌표(X, Y)를 WGS84 위경도 좌표로 100% 공인 표준 변환합니다.
- * @param {number|string} coordX - UTM-K X 좌표 (예: 930800)
- * @param {number|string} coordY - UTM-K Y 좌표 (예: 1947600)
- * @returns {{lat: number, lng: number, isValid: boolean}} 변환된 위도(lat), 경도(lng) 객체
+ * 엑셀 파일 내의 'EPSG4326' 열 좌표 또는 UTM-K(X, Y) 좌표를 WGS84 위경도 좌표로 정밀 변환합니다.
+ * @param {number|string} coordX - UTM-K X 좌표
+ * @param {number|string} coordY - UTM-K Y 좌표
+ * @param {string} [epsg4326Str] - 엑셀에 직접 기재된 EPSG4326 위경도 문자열 (예: "37.5251084278, 126.7168507097")
+ * @returns {{lat: number, lng: number, isValid: boolean, source: string}} 변환된 위도(lat), 경도(lng) 객체
  */
-export function convertUtmkToWgs84(coordX, coordY) {
+export function convertUtmkToWgs84(coordX, coordY, epsg4326Str) {
   try {
+    // 🌟 1순위: 엑셀 파일에 직접 기재된 EPSG4326 (WGS84 위경도) 열 파싱
+    if (epsg4326Str && typeof epsg4326Str === 'string' && epsg4326Str.includes(',')) {
+      const parts = epsg4326Str.split(',');
+      if (parts.length >= 2) {
+        const parseLat = parseFloat(parts[0].trim());
+        const parseLng = parseFloat(parts[1].trim());
+
+        if (!isNaN(parseLat) && !isNaN(parseLng) && parseLat > 0 && parseLng > 0) {
+          return {
+            lat: Number(parseLat.toFixed(7)),
+            lng: Number(parseLng.toFixed(7)),
+            isValid: true,
+            source: 'EXCEL_EPSG4326', // 엑셀 직접 추출 명시
+          };
+        }
+      }
+    }
+
+    // 2순위: UTM-K (EPSG:5179) 좌표 변환
     const numericX = parseFloat(coordX);
     const numericY = parseFloat(coordY);
 
     if (isNaN(numericX) || isNaN(numericY)) {
       console.warn('⚠️ 유효하지 않은 좌표 입력값입니다:', { coordX, coordY });
-      return { lat: 37.5665, lng: 126.9780, isValid: false };
+      return { lat: 37.5665, lng: 126.9780, isValid: false, source: 'DEFAULT' };
     }
 
-    // 🌟 국토교통부 및 공공데이터 공인 100% 표준 UTM-K (EPSG:5179) ➡️ WGS84 변환
     const [lng, lat] = proj4('EPSG:5179', 'WGS84', [numericX, numericY]);
 
     return {
       lat: Number(lat.toFixed(7)),
       lng: Number(lng.toFixed(7)),
       isValid: true,
+      source: 'UTMK_CONVERTED',
     };
   } catch (error) {
     console.error('❌ 좌표 변환 중 오류 발생:', error);
-    return { lat: 37.5665, lng: 126.9780, isValid: false };
+    return { lat: 37.5665, lng: 126.9780, isValid: false, source: 'ERROR' };
   }
 }
