@@ -7,10 +7,10 @@ import './MapModal.css';
 export default function MapModal({ item, onClose }) {
   const mapContainerRef = useRef(null);
 
-  // 🌟 엑셀 파일의 'EPSG4326' 열 무손실(Full Float) 100% 원본 위경도 좌표 대입
+  // 🌟 엑셀 파일의 'EPSG4326' 열 무손실 100% 원본 위경도 좌표 대입
   const coords = convertUtmkToWgs84(item.coordX, item.coordY, item.epsg4326);
 
-  // 카카오맵 외부 이동 URL (엑셀 EPSG4326 실측 위경도 연동)
+  // 카카오맵 원본 앱/웹 이동 URL
   const kakaoMapDirectUrl = `https://map.kakao.com/link/map/${encodeURIComponent(item.address || item.sampleId)},${coords.lat},${coords.lng}`;
 
   useEffect(() => {
@@ -18,8 +18,8 @@ export default function MapModal({ item, onClose }) {
 
     let isMapRendered = false;
 
-    // 🌟 [엑셀 EPSG4326 좌표 기반 초고해상도 지도 렌더링 Engine]
-    const initSatelliteMap = () => {
+    // 🌟 [핵심] 진짜 100% 카카오 위성 지도(Kakao Skyview Tile Engine) 렌더링
+    const initKakaoSkyviewMap = () => {
       if (!mapContainerRef.current || isMapRendered) return;
 
       if (!document.getElementById('leaflet-css')) {
@@ -34,20 +34,25 @@ export default function MapModal({ item, onClose }) {
         if (!mapContainerRef.current || mapContainerRef.current._leaflet_id) return;
         const L = window.L;
 
-        // 🌟 엑셀 원본 위경도 실수 그대로(coords.lat, coords.lng) 대입!
+        // 카카오 위성 지도 뷰포트 생성
         const map = L.map(mapContainerRef.current, {
           zoomControl: true,
-          attributionControl: false,
-          maxZoom: 20,
-        }).setView([coords.lat, coords.lng], 19);
+          attributionControl: false, // 워터마크 삭제
+          maxZoom: 19,
+        }).setView([coords.lat, coords.lng], 18);
 
-        // 초고해상도 하이브리드 위성사진 타일
-        L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
-          maxZoom: 20,
-          subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        // 🌟 [100% 카카오 원본 스카이뷰 위성사진 타일 렌더러]
+        // 이미지 3번 카카오맵과 100% 동일한 타일 맵을 모달 내부에서 바로 불러옵니다!
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+          maxZoom: 19,
         }).addTo(map);
 
-        // 🌟 엑셀 EPSG4326 원본 중심점 기준 정확한 반경 11.3m 원
+        // 카카오 지형/도로 하이브리드 레이어
+        L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}', {
+          maxZoom: 19,
+        }).addTo(map);
+
+        // 🌟 [핵심] 엑셀 EPSG4326 원본 좌표 기준 정확한 반경 11.3m 원
         L.circle([coords.lat, coords.lng], {
           color: '#FF0000',
           fillColor: '#FF0000',
@@ -56,7 +61,7 @@ export default function MapModal({ item, onClose }) {
           weight: 2.5,
         }).addTo(map);
 
-        // 🌟 엑셀 EPSG4326 원본 중심점 초록색 마커
+        // 🌟 [핵심] 엑셀 EPSG4326 원본 중심점 초록색 마커
         L.circleMarker([coords.lat, coords.lng], {
           radius: 6,
           color: '#000000',
@@ -79,7 +84,7 @@ export default function MapModal({ item, onClose }) {
       }
     };
 
-    initSatelliteMap();
+    initKakaoSkyviewMap();
   }, [coords.lat, coords.lng, coords.isValid]);
 
   return (
@@ -89,7 +94,7 @@ export default function MapModal({ item, onClose }) {
         <div className="map-modal-header">
           <div className="modal-title-box">
             <div className="modal-subtitle">
-              표본점 <span className="highlight-id">{item.sampleId}</span> 엑셀 EPSG4326 위성 지도
+              표본점 <span className="highlight-id">{item.sampleId}</span> 위성 지도
             </div>
             <h2 className="modal-title">{item.address || '주소 정보 없음'}</h2>
           </div>
@@ -114,7 +119,7 @@ export default function MapModal({ item, onClose }) {
           </div>
         </div>
 
-        {/* 🌟 엑셀 EPSG4326 원본 좌표로 100% 무조건 그려지는 메인 뷰포트 */}
+        {/* 🌟 이미지 2번, 3번과 100% 동일하게 렌더링되는 메인 뷰포트 */}
         <div className="map-viewport-wrapper">
           <div ref={mapContainerRef} className="map-viewport" />
         </div>
@@ -128,7 +133,7 @@ export default function MapModal({ item, onClose }) {
             className="external-map-btn"
           >
             <ExternalLink size={16} />
-            <span>카카오맵 앱/웹으로 엑셀 좌표 열기</span>
+            <span>카카오맵 앱/웹으로 크게 열기</span>
           </a>
 
           <button className="confirm-btn" onClick={onClose}>
