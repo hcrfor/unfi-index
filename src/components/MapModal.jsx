@@ -4,9 +4,9 @@ import { X, ExternalLink } from 'lucide-react';
 import { convertUtmkToWgs84 } from '../utils/coordinate';
 import './MapModal.css';
 
-// 카카오 디벨로퍼스 자바스크립트 키
-const KAKAO_APP_KEY = '0ea4ab488acf316bce60726d53c59413';
-
+/**
+ * 100% 순수 카카오 지도 (Kakao Maps) 전용 모달 컴포넌트
+ */
 export default function MapModal({ item, onClose }) {
   const mapContainerRef = useRef(null);
 
@@ -19,26 +19,27 @@ export default function MapModal({ item, onClose }) {
   useEffect(() => {
     if (!coords.isValid) return;
 
-    let mapInstance = null;
+    // 🌟 100% 진짜 카카오 지도(Kakao Maps SDK) 전용 초기화
+    const renderPureKakaoMap = () => {
+      if (!mapContainerRef.current || !window.kakao || !window.kakao.maps) return;
 
-    // 🌟 [1단계 시도] 카카오 지도 (Kakao Maps SDK) 렌더링
-    const initKakaoMap = () => {
-      if (!mapContainerRef.current) return;
       const kakao = window.kakao;
       const centerLatLng = new kakao.maps.LatLng(coords.lat, coords.lng);
 
+      // 카카오 지도 맵 생성 (확대 레벨 2: 큼직하고 시원한 뷰)
       const map = new kakao.maps.Map(mapContainerRef.current, {
         center: centerLatLng,
-        level: 2, // 큼직한 확대 레벨
+        level: 2,
       });
 
-      // 스카이뷰(위성사진 + 지명 하이브리드) 적용
+      // 🌟 [핵심] 카카오 스카이뷰 (위성사진 + 지명/도로 하이브리드)
       map.setMapTypeId(kakao.maps.MapTypeId.HYBRID);
 
+      // 지도 컨트롤러 추가
       map.addControl(new kakao.maps.MapTypeControl(), kakao.maps.ControlPosition.TOPRIGHT);
       map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.RIGHT);
 
-      // 반경 11.3m 원 그리기
+      // 🌟 [핵심] 중심점 기준 반경 11.3m 빨간 선 테두리 원
       const circle = new kakao.maps.Circle({
         center: centerLatLng,
         radius: 11.3,
@@ -50,7 +51,7 @@ export default function MapModal({ item, onClose }) {
       });
       circle.setMap(map);
 
-      // 중심점 초록색 마커
+      // 🌟 [핵심] 중심점 초록색 마커 핀 (카카오 커스텀 오버레이)
       const markerContent = `
         <div style="
           width: 14px;
@@ -72,103 +73,12 @@ export default function MapModal({ item, onClose }) {
       customOverlay.setMap(map);
     };
 
-    // 🌟 [2단계 시도] 카카오 도메인 미인증 시 100% 무조건 보장되는 위성사진 지도 렌더링 (Esri World Imagery)
-    const initSeamlessSatelliteMap = () => {
-      if (!mapContainerRef.current) return;
-
-      // Leaflet CSS & JS 동적 주입
-      if (!document.getElementById('leaflet-css')) {
-        const link = document.createElement('link');
-        link.id = 'leaflet-css';
-        link.rel = 'stylesheet';
-        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-        document.head.appendChild(link);
-      }
-
-      const renderLeaflet = () => {
-        if (!mapContainerRef.current || mapContainerRef.current._leaflet_id) return;
-        const L = window.L;
-
-        const map = L.map(mapContainerRef.current, {
-          zoomControl: true,
-          maxZoom: 18.5,
-        }).setView([coords.lat, coords.lng], 18);
-
-        // 고해상도 실제 항공 위성사진 타일 렌더링
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-          maxZoom: 18.5,
-        }).addTo(map);
-
-        // 도로/지명 레이어 겹치기
-        L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}', {
-          maxZoom: 18.5,
-        }).addTo(map);
-
-        // 🌟 [핵심] 반경 11.3m 원 그리기
-        L.circle([coords.lat, coords.lng], {
-          color: '#FF0000',
-          fillColor: '#FF0000',
-          fillOpacity: 0.12,
-          radius: 11.3,
-          weight: 2.5,
-        }).addTo(map);
-
-        // 🌟 [핵심] 중심점 초록색 마커
-        L.circleMarker([coords.lat, coords.lng], {
-          radius: 6,
-          color: '#000000',
-          weight: 1.5,
-          fillColor: '#00FF00',
-          fillOpacity: 1.0,
-        }).addTo(map);
-      };
-
-      if (window.L) {
-        renderLeaflet();
-      } else {
-        const script = document.createElement('script');
-        script.id = 'leaflet-js';
-        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-        script.onload = () => renderLeaflet();
-        document.head.appendChild(script);
-      }
-    };
-
-    // 스크립트 실행 분기
     if (window.kakao && window.kakao.maps) {
-      window.kakao.maps.load(() => {
-        try {
-          initKakaoMap();
-        } catch (e) {
-          initSeamlessSatelliteMap();
-        }
-      });
-    } else {
-      const script = document.createElement('script');
-      script.id = 'kakao-map-sdk';
-      script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_APP_KEY}&autoload=false`;
-      script.async = true;
-
-      script.onload = () => {
-        if (window.kakao && window.kakao.maps) {
-          window.kakao.maps.load(() => {
-            try {
-              initKakaoMap();
-            } catch (e) {
-              initSeamlessSatelliteMap();
-            }
-          });
-        } else {
-          initSeamlessSatelliteMap();
-        }
-      };
-
-      script.onerror = () => {
-        // SDK 차단 시 1초도 지체없이 가득 채워지는 고해상도 위성사진 지도 구동!
-        initSeamlessSatelliteMap();
-      };
-
-      document.head.appendChild(script);
+      if (window.kakao.maps.load) {
+        window.kakao.maps.load(renderPureKakaoMap);
+      } else {
+        renderPureKakaoMap();
+      }
     }
   }, [coords.lat, coords.lng, coords.isValid]);
 
@@ -179,7 +89,7 @@ export default function MapModal({ item, onClose }) {
         <div className="map-modal-header">
           <div className="modal-title-box">
             <div className="modal-subtitle">
-              표본점 <span className="highlight-id">{item.sampleId}</span> 위성 지도
+              표본점 <span className="highlight-id">{item.sampleId}</span> 카카오 위성 지도 (스카이뷰)
             </div>
             <h2 className="modal-title">{item.address || '주소 정보 없음'}</h2>
           </div>
@@ -204,7 +114,7 @@ export default function MapModal({ item, onClose }) {
           </div>
         </div>
 
-        {/* 🌟 100% 무조건 위성사진 + 반경 11.3m 원이 팝업 전체에 가득 채워지는 지점 */}
+        {/* 🌟 100% 순수 카카오 지도(Kakao Maps) 전용 뷰포트 */}
         <div className="map-viewport-wrapper">
           <div ref={mapContainerRef} className="map-viewport" />
         </div>
