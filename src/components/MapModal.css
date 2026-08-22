@@ -156,6 +156,13 @@
   height: 100%;
 }
 
+.kakao-iframe-viewport {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #ffffff;
+}
+
 /* 도메인 승인 안내 오버레이 (모바일 깔끔 반응형) */
 .domain-guide-overlay {
   position: absolute;

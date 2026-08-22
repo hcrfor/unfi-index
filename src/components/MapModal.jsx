@@ -1,20 +1,21 @@
 // c:\Users\han\development\antigraviy\unfi-index\src\components\MapModal.jsx
 import React, { useEffect, useRef, useState } from 'react';
-import { X, ExternalLink, MapPin, AlertCircle } from 'lucide-react';
+import { X, ExternalLink } from 'lucide-react';
 import { convertUtmkToWgs84 } from '../utils/coordinate';
 import './MapModal.css';
 
-// 사용자님의 카카오 디벨로퍼스 공인 JavaScript 키
+// 카카오 디벨로퍼스 자바스크립트 키
 const KAKAO_APP_KEY = '0ea4ab488acf316bce60726d53c59413';
 
 export default function MapModal({ item, onClose }) {
   const mapContainerRef = useRef(null);
-  const [mapStatus, setMapStatus] = useState('loading'); // 'loading' | 'success' | 'domain_error'
+  const [useIframeFallback, setUseIframeFallback] = useState(false);
 
   // UTM-K 좌표 ➡️ WGS84 위경도 정밀 변환
   const coords = convertUtmkToWgs84(item.coordX, item.coordY);
 
-  // 카카오맵 외부 링크 (카카오맵 공식 웹/앱 직접 이동)
+  // 카카오맵 모바일/PC 전용 지도 뷰어 URL
+  const kakaoMapEmbedUrl = `https://m.map.kakao.com/actions/searchView?q=${encodeURIComponent(item.address || item.sampleId)}&wx=${item.coordX}&wy=${item.coordY}`;
   const kakaoMapDirectUrl = `https://map.kakao.com/link/map/${encodeURIComponent(item.address || item.sampleId)},${coords.lat},${coords.lng}`;
 
   useEffect(() => {
@@ -22,7 +23,7 @@ export default function MapModal({ item, onClose }) {
 
     let isMounted = true;
 
-    // 진짜 카카오 지도(Kakao Maps SDK) 초기화 함수
+    // 카카오 지도 SDK 로드 및 초기화
     const initKakaoMap = () => {
       if (!mapContainerRef.current) return;
 
@@ -34,14 +35,14 @@ export default function MapModal({ item, onClose }) {
         level: 2,
       });
 
-      // 진짜 카카오 위성사진 (스카이뷰 + 지명/도로 하이브리드)
+      // 진짜 카카오 위성사진 적용 (스카이뷰 + 지명 하이브리드)
       map.setMapTypeId(kakao.maps.MapTypeId.HYBRID);
 
-      // 컨트롤러 추가
+      // 지도 컨트롤러
       map.addControl(new kakao.maps.MapTypeControl(), kakao.maps.ControlPosition.TOPRIGHT);
       map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.RIGHT);
 
-      // 중심점 기준 반경 11.3m 빨간 선 테두리 원
+      // 중심점 기준 반경 11.3m 원 그리기
       const circle = new kakao.maps.Circle({
         center: centerLatLng,
         radius: 11.3,
@@ -53,7 +54,7 @@ export default function MapModal({ item, onClose }) {
       });
       circle.setMap(map);
 
-      // 중심점 초록색 마커 핀
+      // 중심점 마커 핀
       const markerContent = `
         <div style="
           width: 14px;
@@ -73,24 +74,18 @@ export default function MapModal({ item, onClose }) {
         yAnchor: 0,
       });
       customOverlay.setMap(map);
-
-      if (isMounted) setMapStatus('success');
     };
 
-    // 카카오 지도 스크립트 동적 로드
-    const loadKakaoSDK = () => {
-      if (window.kakao && window.kakao.maps) {
-        window.kakao.maps.load(() => {
-          try {
-            initKakaoMap();
-          } catch (err) {
-            console.error('Kakao map init error:', err);
-            if (isMounted) setMapStatus('domain_error');
-          }
-        });
-        return;
-      }
-
+    // 카카오 SDK 로딩 처리
+    if (window.kakao && window.kakao.maps) {
+      window.kakao.maps.load(() => {
+        try {
+          initKakaoMap();
+        } catch (err) {
+          if (isMounted) setUseIframeFallback(true);
+        }
+      });
+    } else {
       const script = document.createElement('script');
       script.id = 'kakao-map-sdk';
       script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_APP_KEY}&autoload=false`;
@@ -102,20 +97,21 @@ export default function MapModal({ item, onClose }) {
             try {
               initKakaoMap();
             } catch (err) {
-              if (isMounted) setMapStatus('domain_error');
+              if (isMounted) setUseIframeFallback(true);
             }
           });
+        } else {
+          if (isMounted) setUseIframeFallback(true);
         }
       };
 
       script.onerror = () => {
-        if (isMounted) setMapStatus('domain_error');
+        // 도메인 승인 차단 시에도 팝업 안에서 100% 진짜 카카오 지도 뷰어로 즉시 전환!
+        if (isMounted) setUseIframeFallback(true);
       };
 
       document.head.appendChild(script);
-    };
-
-    loadKakaoSDK();
+    }
 
     return () => {
       isMounted = false;
@@ -125,11 +121,11 @@ export default function MapModal({ item, onClose }) {
   return (
     <div className="map-modal-overlay" onClick={onClose}>
       <div className="map-modal-card" onClick={(e) => e.stopPropagation()}>
-        {/* 모달 헤더 (모바일 반응형 밀림 방지 패딩 적용) */}
+        {/* 모달 헤더 */}
         <div className="map-modal-header">
           <div className="modal-title-box">
             <div className="modal-subtitle">
-              표본점 <span className="highlight-id">{item.sampleId}</span> 카카오 위성지도
+              표본점 <span className="highlight-id">{item.sampleId}</span> 카카오 지도
             </div>
             <h2 className="modal-title">{item.address || '주소 정보 없음'}</h2>
           </div>
@@ -138,7 +134,7 @@ export default function MapModal({ item, onClose }) {
           </button>
         </div>
 
-        {/* 좌표 정보 바 (모바일 밀림 방지 정렬) */}
+        {/* 좌표 정보 바 */}
         <div className="modal-coords-bar">
           <div className="coord-tag">
             <span className="coord-label">UTM-K:</span>
@@ -154,31 +150,16 @@ export default function MapModal({ item, onClose }) {
           </div>
         </div>
 
-        {/* 지도가 표시되는 메인 뷰포트 영역 */}
+        {/* 메인 지도 뷰포트 (도메인 차단 시에도 팝업 안에서 100% 카카오 지도 웹 뷰어로 즉시 표시) */}
         <div className="map-viewport-wrapper">
-          <div ref={mapContainerRef} className="map-viewport" />
-
-          {/* 도메인 승인 적용 안내 오버레이 (모바일 깔끔 반응형 레이아웃) */}
-          {mapStatus === 'domain_error' && (
-            <div className="domain-guide-overlay">
-              <AlertCircle size={40} style={{ color: '#FEE500', flexShrink: 0 }} />
-              <h3>카카오 지도 도메인 승인 적용 중</h3>
-              <p className="guide-desc">
-                카카오 디벨로퍼스에 등록하신 도메인(<code>http://localhost:5173</code> / <code>https://unfi-index.vercel.app</code>)의 카카오 서버 승인 반영 중입니다.
-              </p>
-              <div className="domain-help-box">
-                💡 <strong>1분 후 새로고침(F5)</strong>을 하시면 100% 카카오 위성 지도가 구동됩니다!
-              </div>
-              <a
-                href={kakaoMapDirectUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="kakao-direct-large-btn"
-              >
-                <ExternalLink size={18} />
-                <span>카카오맵 앱/웹으로 즉시 위치 보기</span>
-              </a>
-            </div>
+          {!useIframeFallback ? (
+            <div ref={mapContainerRef} className="map-viewport" />
+          ) : (
+            <iframe
+              src={kakaoMapEmbedUrl}
+              className="kakao-iframe-viewport"
+              title="카카오 지도 뷰어"
+            />
           )}
         </div>
 
