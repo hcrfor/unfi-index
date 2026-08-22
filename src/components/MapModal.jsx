@@ -29,20 +29,19 @@ export default function MapModal({ item, onClose }) {
       const kakao = window.kakao;
       const centerLatLng = new kakao.maps.LatLng(coords.lat, coords.lng);
 
-      // 진짜 카카오 지도 생성 (줌 레벨 2: 큼직하고 뚜렷한 확대 뷰)
       const map = new kakao.maps.Map(mapContainerRef.current, {
         center: centerLatLng,
         level: 2,
       });
 
-      // 🌟 [핵심] 진짜 카카오 위성사진 (스카이뷰 + 지명/도로 하이브리드)
+      // 진짜 카카오 위성사진 (스카이뷰 + 지명/도로 하이브리드)
       map.setMapTypeId(kakao.maps.MapTypeId.HYBRID);
 
       // 컨트롤러 추가
       map.addControl(new kakao.maps.MapTypeControl(), kakao.maps.ControlPosition.TOPRIGHT);
       map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.RIGHT);
 
-      // 🌟 [핵심] 중심점 기준 반경 11.3m 빨간 선 테두리 원
+      // 중심점 기준 반경 11.3m 빨간 선 테두리 원
       const circle = new kakao.maps.Circle({
         center: centerLatLng,
         radius: 11.3,
@@ -54,7 +53,7 @@ export default function MapModal({ item, onClose }) {
       });
       circle.setMap(map);
 
-      // 🌟 [핵심] 중심점 초록색 마커 핀
+      // 중심점 초록색 마커 핀
       const markerContent = `
         <div style="
           width: 14px;
@@ -110,7 +109,6 @@ export default function MapModal({ item, onClose }) {
       };
 
       script.onerror = () => {
-        // 도메인 인증 승인 대기 중 오류 시
         if (isMounted) setMapStatus('domain_error');
       };
 
@@ -127,27 +125,27 @@ export default function MapModal({ item, onClose }) {
   return (
     <div className="map-modal-overlay" onClick={onClose}>
       <div className="map-modal-card" onClick={(e) => e.stopPropagation()}>
-        {/* 모달 헤더 */}
+        {/* 모달 헤더 (모바일 반응형 밀림 방지 패딩 적용) */}
         <div className="map-modal-header">
           <div className="modal-title-box">
             <div className="modal-subtitle">
-              표본점 <span className="highlight-id">{item.sampleId}</span> 카카오 위성 지도 (스카이뷰)
+              표본점 <span className="highlight-id">{item.sampleId}</span> 카카오 위성지도
             </div>
             <h2 className="modal-title">{item.address || '주소 정보 없음'}</h2>
           </div>
           <button className="modal-close-btn" onClick={onClose} aria-label="닫기">
-            <X size={24} />
+            <X size={22} />
           </button>
         </div>
 
-        {/* 좌표 정보 바 */}
+        {/* 좌표 정보 바 (모바일 밀림 방지 정렬) */}
         <div className="modal-coords-bar">
           <div className="coord-tag">
             <span className="coord-label">UTM-K:</span>
             <span className="coord-val">X {item.coordX} / Y {item.coordY}</span>
           </div>
           <div className="coord-tag highlight">
-            <span className="coord-label">WGS84 (위경도):</span>
+            <span className="coord-label">WGS84:</span>
             <span className="coord-val">{coords.lat}°, {coords.lng}°</span>
           </div>
           <div className="coord-tag radius">
@@ -156,21 +154,20 @@ export default function MapModal({ item, onClose }) {
           </div>
         </div>
 
-        {/* 🌟 순수 100% 진짜 카카오 지도(Kakao Maps) 뷰포트 */}
+        {/* 지도가 표시되는 메인 뷰포트 영역 */}
         <div className="map-viewport-wrapper">
           <div ref={mapContainerRef} className="map-viewport" />
 
-          {/* 도메인 승인 대기 안내오버레이 (카카오 디벨로퍼스 웹 도메인 승인 1분 소요 안내) */}
+          {/* 도메인 승인 적용 안내 오버레이 (모바일 깔끔 반응형 레이아웃) */}
           {mapStatus === 'domain_error' && (
             <div className="domain-guide-overlay">
-              <AlertCircle size={44} style={{ color: '#FEE500' }} />
-              <h3>카카오 지도 도메인 승인 적용 중...</h3>
-              <p>
-                카카오 디벨로퍼스에 등록하신 도메인(<code>http://localhost:5173</code>)의 
-                카카오 지도 서버 승인에 약 1분 정도 소요됩니다.
+              <AlertCircle size={40} style={{ color: '#FEE500', flexShrink: 0 }} />
+              <h3>카카오 지도 도메인 승인 적용 중</h3>
+              <p className="guide-desc">
+                카카오 디벨로퍼스에 등록하신 도메인(<code>http://localhost:5173</code> / <code>https://unfi-index.vercel.app</code>)의 카카오 서버 승인 반영 중입니다.
               </p>
               <div className="domain-help-box">
-                💡 <strong>1분 후 페이지를 새로고침(F5)</strong> 하시면 100% 카카오 스카이뷰 위성 지도가 구동됩니다!
+                💡 <strong>1분 후 새로고침(F5)</strong>을 하시면 100% 카카오 위성 지도가 구동됩니다!
               </div>
               <a
                 href={kakaoMapDirectUrl}
@@ -179,7 +176,7 @@ export default function MapModal({ item, onClose }) {
                 className="kakao-direct-large-btn"
               >
                 <ExternalLink size={18} />
-                <span>카카오맵 전용 앱/웹으로 즉시 위치 보기</span>
+                <span>카카오맵 앱/웹으로 즉시 위치 보기</span>
               </a>
             </div>
           )}
@@ -193,7 +190,7 @@ export default function MapModal({ item, onClose }) {
             rel="noopener noreferrer"
             className="external-map-btn"
           >
-            <ExternalLink size={18} />
+            <ExternalLink size={16} />
             <span>카카오맵 앱/웹으로 크게 열기</span>
           </a>
 
