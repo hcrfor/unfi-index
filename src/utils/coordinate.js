@@ -10,7 +10,7 @@ proj4.defs(
 );
 
 /**
- * 엑셀 파일 내의 'EPSG4326' 열 좌표 또는 UTM-K(X, Y) 좌표를 WGS84 위경도 좌표로 정밀 변환합니다.
+ * 엑셀 파일 내의 'EPSG4326' 열 좌표 또는 UTM-K(X, Y) 좌표를 WGS84 위경도 좌표로 무손실 정밀 변환합니다.
  * @param {number|string} coordX - UTM-K X 좌표
  * @param {number|string} coordY - UTM-K Y 좌표
  * @param {string} [epsg4326Str] - 엑셀에 직접 기재된 EPSG4326 위경도 문자열 (예: "37.5251084278, 126.7168507097")
@@ -18,25 +18,25 @@ proj4.defs(
  */
 export function convertUtmkToWgs84(coordX, coordY, epsg4326Str) {
   try {
-    // 🌟 1순위: 엑셀 파일에 직접 기재된 EPSG4326 (WGS84 위경도) 열 파싱
+    // 🌟 1순위: 엑셀 파일의 'EPSG4326' 열 원본 위경도 실수값을 반올림 손실 0% 그대로 직접 100% 대입!
     if (epsg4326Str && typeof epsg4326Str === 'string' && epsg4326Str.includes(',')) {
       const parts = epsg4326Str.split(',');
       if (parts.length >= 2) {
-        const parseLat = parseFloat(parts[0].trim());
-        const parseLng = parseFloat(parts[1].trim());
+        const rawLat = parseFloat(parts[0].trim());
+        const rawLng = parseFloat(parts[1].trim());
 
-        if (!isNaN(parseLat) && !isNaN(parseLng) && parseLat > 0 && parseLng > 0) {
+        if (!isNaN(rawLat) && !isNaN(rawLng) && rawLat > 0 && rawLng > 0) {
           return {
-            lat: Number(parseLat.toFixed(7)),
-            lng: Number(parseLng.toFixed(7)),
+            lat: rawLat, // 소수점 반올림 전연 없이 엑셀 원본 실수 그대로!
+            lng: rawLng, // 소수점 반올림 전혀 없이 엑셀 원본 실수 그대로!
             isValid: true,
-            source: 'EXCEL_EPSG4326', // 엑셀 직접 추출 명시
+            source: 'EXCEL_EPSG4326_RAW',
           };
         }
       }
     }
 
-    // 2순위: UTM-K (EPSG:5179) 좌표 변환
+    // 2순위: UTM-K (EPSG:5179) 좌표 표준 변환
     const numericX = parseFloat(coordX);
     const numericY = parseFloat(coordY);
 
@@ -48,8 +48,8 @@ export function convertUtmkToWgs84(coordX, coordY, epsg4326Str) {
     const [lng, lat] = proj4('EPSG:5179', 'WGS84', [numericX, numericY]);
 
     return {
-      lat: Number(lat.toFixed(7)),
-      lng: Number(lng.toFixed(7)),
+      lat: lat,
+      lng: lng,
       isValid: true,
       source: 'UTMK_CONVERTED',
     };
