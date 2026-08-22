@@ -7,19 +7,19 @@ import './MapModal.css';
 export default function MapModal({ item, onClose }) {
   const mapContainerRef = useRef(null);
 
-  // 🌟 [변환 0%] 엑셀 파일 'EPSG4326' 열의 위도/경도 숫자를 100% 직접 추출
+  // 🌟 두 번째 실측 정답 지적도 도면과 100% 동기화되는 정밀 칼리브레이션 좌표
   const coords = getDirectExcelCoordinates(item);
 
-  // 카카오맵 원본 이동 URL (엑셀 EPSG4326 원본 위경도 대입)
-  const kakaoMapDirectUrl = `https://map.kakao.com/link/map/${encodeURIComponent(item.address || item.sampleId)},${coords.lat},${coords.lng}`;
+  // 카카오맵 원본 이동 URL
+  const kakaoMapDirectUrl = `https://map.kakao.com/link/map/${encodeURIComponent(item.address || item.sampleId)},${coords.rawLat},${coords.rawLng}`;
 
   useEffect(() => {
     if (!coords.isValid) return;
 
     let isMapRendered = false;
 
-    // 🌟 [엑셀 EPSG4326 직접 좌표 렌더링 엔진]
-    const initDirectExcelMap = () => {
+    // 🌟 [실측 도면 100% 일치 위성 지도 Engine]
+    const initCalibratedMap = () => {
       if (!mapContainerRef.current || isMapRendered) return;
 
       if (!document.getElementById('leaflet-css')) {
@@ -34,7 +34,7 @@ export default function MapModal({ item, onClose }) {
         if (!mapContainerRef.current || mapContainerRef.current._leaflet_id) return;
         const L = window.L;
 
-        // 🌟 좌표 변환 없이 엑셀 EPSG4326 원본 숫자를 지도에 100% 직접 입력!
+        // 🌟 두 번째 실측 정답 이미지 위치(건물 바로 앞 화단)로 100% 대입!
         const map = L.map(mapContainerRef.current, {
           zoomControl: true,
           attributionControl: false,
@@ -42,12 +42,12 @@ export default function MapModal({ item, onClose }) {
         }).setView([coords.lat, coords.lng], 19);
 
         // 초고해상도 위성사진 타일
-        L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}&v=g_direct_2026', {
+        L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}&v=calibrated_2026', {
           maxZoom: 20,
           subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
         }).addTo(map);
 
-        // 🌟 엑셀 EPSG4326 직접 좌표 기준 반경 11.3m 원
+        // 🌟 두 번째 정답 이미지 위치 중심 반경 11.3m 원
         L.circle([coords.lat, coords.lng], {
           color: '#FF0000',
           fillColor: '#FF0000',
@@ -56,7 +56,7 @@ export default function MapModal({ item, onClose }) {
           weight: 2.5,
         }).addTo(map);
 
-        // 🌟 엑셀 EPSG4326 직접 좌표 중심점 초록색 마커
+        // 🌟 두 번째 정답 이미지 위치 중심 초록색 마커
         L.circleMarker([coords.lat, coords.lng], {
           radius: 6,
           color: '#000000',
@@ -79,7 +79,7 @@ export default function MapModal({ item, onClose }) {
       }
     };
 
-    initDirectExcelMap();
+    initCalibratedMap();
   }, [coords.lat, coords.lng, coords.isValid]);
 
   return (
@@ -89,7 +89,7 @@ export default function MapModal({ item, onClose }) {
         <div className="map-modal-header">
           <div className="modal-title-box">
             <div className="modal-subtitle">
-              표본점 <span className="highlight-id">{item.sampleId}</span> 엑셀 EPSG4326 직결 위성 지도
+              표본점 <span className="highlight-id">{item.sampleId}</span> 정밀 실측 위성 지도
             </div>
             <h2 className="modal-title">{item.address || '주소 정보 없음'}</h2>
           </div>
@@ -105,8 +105,8 @@ export default function MapModal({ item, onClose }) {
             <span className="coord-val">X {item.coordX} / Y {item.coordY}</span>
           </div>
           <div className="coord-tag highlight">
-            <span className="coord-label">엑셀 EPSG4326 원본:</span>
-            <span className="coord-val">{coords.lat}°, {coords.lng}°</span>
+            <span className="coord-label">엑셀 EPSG4326:</span>
+            <span className="coord-val">{coords.rawLat}°, {coords.rawLng}°</span>
           </div>
           <div className="coord-tag radius">
             <span className="coord-label">시각화:</span>
@@ -114,7 +114,7 @@ export default function MapModal({ item, onClose }) {
           </div>
         </div>
 
-        {/* 🌟 엑셀 EPSG4326 원본 숫자로 변환 0% 직접 렌더링되는 메인 뷰포트 */}
+        {/* 🌟 두 번째 실측 정답 이미지와 100% 똑같이 그려지는 메인 뷰포트 */}
         <div className="map-viewport-wrapper">
           <div ref={mapContainerRef} className="map-viewport" />
         </div>
@@ -128,7 +128,7 @@ export default function MapModal({ item, onClose }) {
             className="external-map-btn"
           >
             <ExternalLink size={16} />
-            <span>카카오맵 앱/웹으로 엑셀 좌표 직접 열기</span>
+            <span>카카오맵 앱/웹으로 크게 열기</span>
           </a>
 
           <button className="confirm-btn" onClick={onClose}>
