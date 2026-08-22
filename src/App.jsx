@@ -7,8 +7,10 @@ import {
   Check, 
   AlertCircle,
   Database,
-  Info
+  Info,
+  MapPin
 } from 'lucide-react';
+import MapModal from './components/MapModal';
 import './App.css';
 
 function App() {
@@ -16,6 +18,7 @@ function App() {
   const [pdfData, setPdfData] = useState([]);       // 파싱된 표본점 데이터 전체 목록
   const [searchTerm, setSearchTerm] = useState(''); // 검색창 입력값
   const [isLoading, setIsLoading] = useState(true);  // 로딩 상태 (JSON 패치)
+  const [selectedMapItem, setSelectedMapItem] = useState(null); // 지도 모달용 선택된 표본점 item
 
   // 컴포넌트 시작 시 public/data.json 정적 데이터 패치
   useEffect(() => {
@@ -169,9 +172,19 @@ function App() {
                     
                     {/* 상세 정보 그리드 영역 - 한 화면에 팝업 없이 모두 표시 */}
                     <div className="card-body-grid">
-                      <div className="grid-item full-width">
-                        <span className="grid-label">주소</span>
-                        <span className="grid-value">{item.address}</span>
+                      <div className="grid-item full-width address-grid-item">
+                        <div className="address-text-group">
+                          <span className="grid-label">주소</span>
+                          <span className="grid-value">{item.address}</span>
+                        </div>
+                        <button 
+                          className="location-view-btn"
+                          onClick={() => setSelectedMapItem(item)}
+                          title="위성 지도 및 반경 11.3m 원 보기"
+                        >
+                          <MapPin size={16} />
+                          <span>위치보기</span>
+                        </button>
                       </div>
                       <div className="grid-item">
                         <span className="grid-label">X 좌표</span>
@@ -197,6 +210,14 @@ function App() {
           </div>
         )}
       </main>
+
+      {/* 지도 모달 팝업 */}
+      {selectedMapItem && (
+        <MapModal 
+          item={selectedMapItem} 
+          onClose={() => setSelectedMapItem(null)} 
+        />
+      )}
     </div>
   );
 }

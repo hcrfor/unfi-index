@@ -437,6 +437,54 @@
   grid-column: span 2;
 }
 
+.grid-item.address-grid-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  background: #f8fafc;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.address-text-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+/* 주소 옆 📍 위치보기 버튼 디자인 */
+.location-view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #10b981;
+  color: #ffffff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.location-view-btn:hover {
+  background-color: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(16, 185, 129, 0.35);
+}
+
+.location-view-btn:active {
+  transform: translateY(0);
+}
+
 .grid-label {
   font-size: 13px;
   color: var(--text-sub);
