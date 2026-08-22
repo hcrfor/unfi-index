@@ -52,7 +52,7 @@ export default function MapModal({ item, onClose }) {
         });
         circle.setMap(map);
 
-        // 중심점 초록 핀
+        // 중심점 마커
         const customOverlay = new kakao.maps.CustomOverlay({
           position: centerLatLng,
           content: `
@@ -78,8 +78,8 @@ export default function MapModal({ item, onClose }) {
       }
     };
 
-    // 2. 100% 빈 화면 0% 무조건 가득 채워지는 고해상도 실시간 위성 지도 엔진
-    const initHighResSatelliteMap = () => {
+    // 🌟 [2. 구글 위성 지도 렌더링 지원 (Google Maps Satellite Engine)]
+    const initGoogleSatelliteMap = () => {
       if (!mapContainerRef.current || isMapRendered) return;
 
       if (!document.getElementById('leaflet-css')) {
@@ -90,27 +90,24 @@ export default function MapModal({ item, onClose }) {
         document.head.appendChild(link);
       }
 
-      const drawMap = () => {
+      const drawGoogleMap = () => {
         if (!mapContainerRef.current || mapContainerRef.current._leaflet_id) return;
         const L = window.L;
 
+        // 구글 맵 뷰포트 생성
         const map = L.map(mapContainerRef.current, {
           zoomControl: true,
-          attributionControl: false, // 하단 글자 지움
-          maxZoom: 18.5,
-        }).setView([coords.lat, coords.lng], 18);
+          attributionControl: false, // 워터마크 완전 제거!
+          maxZoom: 20,
+        }).setView([coords.lat, coords.lng], 19);
 
-        // 고해상도 실제 항공 위성사진 타일 렌더링
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-          maxZoom: 18.5,
+        // 🌟 [핵심] 고해상도 구글 하이브리드 위성 지도 타일 (Google Satellite + Hybrid)
+        L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+          maxZoom: 20,
+          subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
         }).addTo(map);
 
-        // 도로/지명 레이어
-        L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}', {
-          maxZoom: 18.5,
-        }).addTo(map);
-
-        // 🌟 반경 11.3m 원 그리기
+        // 🌟 [핵심] 반경 11.3m 원 그리기
         L.circle([coords.lat, coords.lng], {
           color: '#FF0000',
           fillColor: '#FF0000',
@@ -119,7 +116,7 @@ export default function MapModal({ item, onClose }) {
           weight: 2.5,
         }).addTo(map);
 
-        // 🌟 중심점 초록색 마커
+        // 🌟 [핵심] 중심점 초록색 마커
         L.circleMarker([coords.lat, coords.lng], {
           radius: 6,
           color: '#000000',
@@ -132,23 +129,23 @@ export default function MapModal({ item, onClose }) {
       };
 
       if (window.L) {
-        drawMap();
+        drawGoogleMap();
       } else {
         const script = document.createElement('script');
         script.id = 'leaflet-js';
         script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-        script.onload = () => drawMap();
+        script.onload = () => drawGoogleMap();
         document.head.appendChild(script);
       }
     };
 
-    // 카카오 지도 시도 ➡️ 미승인 시 100% 무조건 보장되는 위성 지도 실행
+    // 실행 분기: 카카오 지도 렌더링 시도 ➡️ 카카오 차단 시 100% '구글 위성 지도 (Google Maps)'로 즉시 렌더링!
     const success = initKakaoMap();
     if (!success) {
       const timer = setTimeout(() => {
         const retrySuccess = initKakaoMap();
         if (!retrySuccess) {
-          initHighResSatelliteMap();
+          initGoogleSatelliteMap();
         }
       }, 150);
       return () => clearTimeout(timer);
@@ -162,7 +159,7 @@ export default function MapModal({ item, onClose }) {
         <div className="map-modal-header">
           <div className="modal-title-box">
             <div className="modal-subtitle">
-              표본점 <span className="highlight-id">{item.sampleId}</span> 위성 지도
+              표본점 <span className="highlight-id">{item.sampleId}</span> 위성 지도 (구글/카카오)
             </div>
             <h2 className="modal-title">{item.address || '주소 정보 없음'}</h2>
           </div>
@@ -187,7 +184,7 @@ export default function MapModal({ item, onClose }) {
           </div>
         </div>
 
-        {/* 🌟 100% 빈 화면 0% 무조건 가득 채워지는 지점 */}
+        {/* 🌟 구글 위성 지도 (Google Satellite Maps) 뷰포트 */}
         <div className="map-viewport-wrapper">
           <div ref={mapContainerRef} className="map-viewport" />
         </div>
@@ -201,7 +198,7 @@ export default function MapModal({ item, onClose }) {
             className="external-map-btn"
           >
             <ExternalLink size={16} />
-            <span>카카오맵 앱/웹으로 크게 열기</span>
+            <span>카카오맵 앱/웹으로 직접 열기</span>
           </a>
 
           <button className="confirm-btn" onClick={onClose}>
