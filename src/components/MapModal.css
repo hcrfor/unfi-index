@@ -156,6 +156,11 @@
   height: 100%;
 }
 
+/* 하단 워터마크 표시 완전 숨김 */
+.leaflet-control-attribution {
+  display: none !important;
+}
+
 .kakao-iframe-viewport {
   width: 100%;
   height: 100%;
