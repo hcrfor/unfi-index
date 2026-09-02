@@ -52886,5 +52886,16 @@
     "elevation": "125",
     "epsg4326": "-",
     "sourceFile": "2026 전국 인덱스.xlsx"
+  },
+  {
+    "sampleId": "280912219483",
+    "type": "가로수",
+    "coordX": "912200",
+    "coordY": "1948300",
+    "address": "인천광역시 중구 운북동 1352-9",
+    "surveyId": "인천중구_필수_9",
+    "elevation": "9",
+    "epsg4326": "-",
+    "sourceFile": "2026 전국 인덱스.xlsx"
   }
 ]
