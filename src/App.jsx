@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Search, 
-  FileText, 
-  X, 
-  Copy, 
-  Check, 
-  AlertCircle,
   Database,
   Info,
-  MapPin
+  MapPin,
+  Navigation
 } from 'lucide-react';
 import MapModal from './components/MapModal';
+import { openKakaoRoute } from './utils/coordinate';
 import './App.css';
 
 function App() {
@@ -175,14 +172,26 @@ function App() {
                       <div className="grid-item full-width address-grid-item">
                         <div className="address-header-row">
                           <span className="grid-label">주소</span>
-                          <button 
-                            className="location-view-btn"
-                            onClick={() => setSelectedMapItem(item)}
-                            title="위성 지도 및 반경 11.3m 원 보기"
-                          >
-                            <MapPin size={14} />
-                            <span>위치보기</span>
-                          </button>
+                          <div className="address-actions">
+                            {/* 🌟 카드 내 카카오 실시간 자동차 길안내 버튼 */}
+                            <button 
+                              className="card-route-btn"
+                              onClick={() => openKakaoRoute(item)}
+                              title="카카오맵으로 자동차 실시간 길안내 시작"
+                            >
+                              <Navigation size={13} className="route-icon" />
+                              <span>카카오 길안내</span>
+                            </button>
+                            {/* 🌟 위성 지도 및 반경 11.3m 위치보기 버튼 */}
+                            <button 
+                              className="location-view-btn"
+                              onClick={() => setSelectedMapItem(item)}
+                              title="위성 지도 및 반경 11.3m 원 보기"
+                            >
+                              <MapPin size={13} />
+                              <span>위치보기</span>
+                            </button>
+                          </div>
                         </div>
                         <div className="address-text-full">
                           {item.address}

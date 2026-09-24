@@ -462,6 +462,47 @@
   line-height: 1.35;
 }
 
+.address-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* 주소 우측 상단 🧭 카카오 길안내 콤팩트 뱃지 버튼 */
+.card-route-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: #FEE500;
+  color: #191919;
+  border: 1px solid #e5ce00;
+  padding: 5px 11px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.card-route-btn:hover {
+  background-color: #fada0a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.14);
+}
+
+.card-route-btn:active {
+  transform: translateY(0);
+}
+
+.card-route-btn .route-icon {
+  fill: #191919;
+  transform: rotate(45deg);
+}
+
 /* 주소 우측 상단 📍 위치보기 콤팩트 뱃지 버튼 */
 .location-view-btn {
   display: inline-flex;

@@ -43,3 +43,40 @@ export function getDirectExcelCoordinates(item) {
 export function convertUtmkToWgs84(coordX, coordY, epsg4326Str) {
   return getDirectExcelCoordinates({ coordX, coordY, epsg4326: epsg4326Str });
 }
+
+/**
+ * 🧭 도메인 인증 오류 없는 100% 카카오 실시간 자동차 길안내/내비 실행 유틸
+ */
+export function openKakaoRoute(item) {
+  const coords = getDirectExcelCoordinates(item);
+  if (!coords.isValid) {
+    alert('유효한 좌표 정보가 없습니다.');
+    return;
+  }
+
+  const destName = item.address || `표본점 ${item.sampleId}`;
+  const lat = Number(coords.lat);
+  const lng = Number(coords.lng);
+  const isAndroid = /Android/i.test(navigator.userAgent);
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  // 공식 카카오맵 자동차 길찾기 웹/앱 통합 URL
+  const webFallbackUrl = `https://map.kakao.com/link/to/${encodeURIComponent(destName)},${lat},${lng}`;
+
+  if (isAndroid) {
+    // 📱 안드로이드: 카카오맵 앱의 자동차 길안내 인텐트 즉시 호출 (미설치 시 웹으로 안전 자동 전환)
+    const androidIntentUrl = `intent://route?ep=${lat},${lng}&by=car#Intent;scheme=kakaomap;package=net.daum.android.map;S.browser_fallback_url=${encodeURIComponent(webFallbackUrl)};end`;
+    window.location.href = androidIntentUrl;
+  } else if (isIOS) {
+    // 📱 iOS: 카카오맵 앱 자동차 길찾기 URL Scheme 호출 후 타이머 폴백
+    const iosSchemeUrl = `kakaomap://route?ep=${lat},${lng}&by=car`;
+    window.location.href = iosSchemeUrl;
+    setTimeout(() => {
+      window.location.href = webFallbackUrl;
+    }, 1200);
+  } else {
+    // 💻 PC 브라우저 환경: 카카오맵 길찾기 웹 페이지 새 탭 오픈
+    window.open(webFallbackUrl, '_blank', 'noopener,noreferrer');
+  }
+}
+
