@@ -1,6 +1,6 @@
 // c:\Users\han\development\antigraviy\unfi-index\src\components\MapModal.jsx
 import React, { useEffect, useRef } from 'react';
-import { X, ExternalLink } from 'lucide-react';
+import { X, ExternalLink, Navigation } from 'lucide-react';
 import { getDirectExcelCoordinates } from '../utils/coordinate';
 import './MapModal.css';
 
@@ -12,6 +12,49 @@ export default function MapModal({ item, onClose }) {
 
   // 카카오맵 직접 열기 URL (엑셀 EPSG4326 좌표 연동)
   const kakaoMapDirectUrl = `https://map.kakao.com/link/map/${encodeURIComponent(item.address || item.sampleId)},${coords.lat},${coords.lng}`;
+
+  // 🧭 카카오 JavaScript SDK 초기화 (카카오내비 앱 실행 지원)
+  useEffect(() => {
+    if (window.Kakao && !window.Kakao.isInitialized()) {
+      window.Kakao.init('0ea4ab488acf316bce60726d53c59413');
+    }
+  }, []);
+
+  // 🧭 카카오내비 앱 연동 핸들러
+  const handleOpenKakaoNavi = () => {
+    if (!coords.isValid) {
+      alert('유효한 좌표 정보가 없습니다.');
+      return;
+    }
+
+    const destName = item.address || `표본점 ${item.sampleId}`;
+    const lat = Number(coords.lat);
+    const lng = Number(coords.lng);
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    // 1. 모바일 환경인 경우: 카카오내비 앱 실행 시도 (앱 설치 시 즉시 실행, 미설치 시 스토어 이동)
+    if (isMobile && window.Kakao && window.Kakao.Navi) {
+      try {
+        if (!window.Kakao.isInitialized()) {
+          window.Kakao.init('0ea4ab488acf316bce60726d53c59413');
+        }
+        window.Kakao.Navi.start({
+          name: destName,
+          x: lng,
+          y: lat,
+          coordType: 'wgs84',
+        });
+        return;
+      } catch (err) {
+        console.warn('Kakao Navi SDK 호출 실패, 카카오맵 길찾기로 전환:', err);
+      }
+    }
+
+    // 2. PC 데스크톱 환경이거나 SDK 미동작 시: 카카오맵 길찾기 웹 페이지로 안내
+    // (카카오내비는 모바일 전용 앱이므로, PC 브라우저 환경에서는 카카오맵의 차량 길찾기 화면으로 자동 연결)
+    const kakaoRouteUrl = `https://map.kakao.com/link/to/${encodeURIComponent(destName)},${lat},${lng}`;
+    window.open(kakaoRouteUrl, '_blank', 'noopener,noreferrer');
+  };
 
   useEffect(() => {
     if (!coords.isValid || !mapContainerRef.current) return;
@@ -212,15 +255,30 @@ export default function MapModal({ item, onClose }) {
 
         {/* 모달 푸터 */}
         <div className="map-modal-footer">
-          <a
-            href={kakaoMapDirectUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="external-map-btn"
-          >
-            <ExternalLink size={16} />
-            <span>카카오맵 앱/웹으로 직접 열기</span>
-          </a>
+          <div className="map-action-group">
+            {/* 🌟 카카오내비 앱 연동 버튼 */}
+            <button
+              type="button"
+              className="kakaonavi-btn"
+              onClick={handleOpenKakaoNavi}
+              title="카카오내비 앱으로 바로 길안내를 시작합니다"
+            >
+              <Navigation size={15} className="navi-icon" />
+              <span>카카오내비 길안내</span>
+            </button>
+
+            {/* 🌟 카카오맵 보기 버튼 */}
+            <a
+              href={kakaoMapDirectUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="kakaomap-btn"
+              title="카카오맵에서 표본점 위치를 확인합니다"
+            >
+              <ExternalLink size={15} />
+              <span>카카오맵 보기</span>
+            </a>
+          </div>
 
           <button className="confirm-btn" onClick={onClose}>
             닫기
