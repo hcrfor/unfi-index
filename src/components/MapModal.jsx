@@ -13,15 +13,8 @@ export default function MapModal({ item, onClose }) {
   // 카카오맵 직접 열기 URL (엑셀 EPSG4326 좌표 연동)
   const kakaoMapDirectUrl = `https://map.kakao.com/link/map/${encodeURIComponent(item.address || item.sampleId)},${coords.lat},${coords.lng}`;
 
-  // 🧭 카카오 JavaScript SDK 초기화 (카카오내비 앱 실행 지원)
-  useEffect(() => {
-    if (window.Kakao && !window.Kakao.isInitialized()) {
-      window.Kakao.init('0ea4ab488acf316bce60726d53c59413');
-    }
-  }, []);
-
-  // 🧭 카카오내비 앱 연동 핸들러
-  const handleOpenKakaoNavi = () => {
+  // 🧭 [방법 2] 도메인 인증 오류 0% 카카오 실시간 자동차 길안내/내비 연동
+  const handleOpenKakaoRoute = () => {
     if (!coords.isValid) {
       alert('유효한 좌표 정보가 없습니다.');
       return;
@@ -30,30 +23,27 @@ export default function MapModal({ item, onClose }) {
     const destName = item.address || `표본점 ${item.sampleId}`;
     const lat = Number(coords.lat);
     const lng = Number(coords.lng);
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-    // 1. 모바일 환경인 경우: 카카오내비 앱 실행 시도 (앱 설치 시 즉시 실행, 미설치 시 스토어 이동)
-    if (isMobile && window.Kakao && window.Kakao.Navi) {
-      try {
-        if (!window.Kakao.isInitialized()) {
-          window.Kakao.init('0ea4ab488acf316bce60726d53c59413');
-        }
-        window.Kakao.Navi.start({
-          name: destName,
-          x: lng,
-          y: lat,
-          coordType: 'wgs84',
-        });
-        return;
-      } catch (err) {
-        console.warn('Kakao Navi SDK 호출 실패, 카카오맵 길찾기로 전환:', err);
-      }
+    // 공식 카카오맵 자동차 길찾기 웹/앱 통합 URL
+    const webFallbackUrl = `https://map.kakao.com/link/to/${encodeURIComponent(destName)},${lat},${lng}`;
+
+    if (isAndroid) {
+      // 📱 안드로이드: 카카오맵 앱의 자동차 길안내 인텐트 즉시 호출 (미설치 시 웹으로 안전 자동 전환)
+      const androidIntentUrl = `intent://route?ep=${lat},${lng}&by=car#Intent;scheme=kakaomap;package=net.daum.android.map;S.browser_fallback_url=${encodeURIComponent(webFallbackUrl)};end`;
+      window.location.href = androidIntentUrl;
+    } else if (isIOS) {
+      // 📱 iOS: 카카오맵 앱 자동차 길찾기 URL Scheme 호출 후 타이머 폴백
+      const iosSchemeUrl = `kakaomap://route?ep=${lat},${lng}&by=car`;
+      window.location.href = iosSchemeUrl;
+      setTimeout(() => {
+        window.location.href = webFallbackUrl;
+      }, 1200);
+    } else {
+      // 💻 PC 브라우저 환경: 카카오맵 길찾기 웹 페이지 새 탭 오픈
+      window.open(webFallbackUrl, '_blank', 'noopener,noreferrer');
     }
-
-    // 2. PC 데스크톱 환경이거나 SDK 미동작 시: 카카오맵 길찾기 웹 페이지로 안내
-    // (카카오내비는 모바일 전용 앱이므로, PC 브라우저 환경에서는 카카오맵의 차량 길찾기 화면으로 자동 연결)
-    const kakaoRouteUrl = `https://map.kakao.com/link/to/${encodeURIComponent(destName)},${lat},${lng}`;
-    window.open(kakaoRouteUrl, '_blank', 'noopener,noreferrer');
   };
 
   useEffect(() => {
@@ -256,15 +246,15 @@ export default function MapModal({ item, onClose }) {
         {/* 모달 푸터 */}
         <div className="map-modal-footer">
           <div className="map-action-group">
-            {/* 🌟 카카오내비 앱 연동 버튼 */}
+            {/* 🌟 도메인 인증 오류 없는 카카오 실시간 길안내 버튼 */}
             <button
               type="button"
               className="kakaonavi-btn"
-              onClick={handleOpenKakaoNavi}
-              title="카카오내비 앱으로 바로 길안내를 시작합니다"
+              onClick={handleOpenKakaoRoute}
+              title="카카오맵으로 자동차 실시간 길안내를 시작합니다 (인증 불필요)"
             >
               <Navigation size={15} className="navi-icon" />
-              <span>카카오내비 길안내</span>
+              <span>카카오 길안내</span>
             </button>
 
             {/* 🌟 카카오맵 보기 버튼 */}
